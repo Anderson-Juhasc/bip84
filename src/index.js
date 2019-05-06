@@ -50,9 +50,12 @@ bip84.prototype.toNode = function() {
 }
 
 // this function takes an index, and turns the pubkey of that node into a Segwit bech32 address
-bip84.prototype.getAddress = function (index) {
+bip84.prototype.getAddress = function (index, isChange) {
+  isChange = isChange !== true ? false : true
+  let change = isChange ? 1 : 0
+
   const payment = bjs.payments.p2wpkh({
-    pubkey: bjs.bip32.fromBase58(this.node, this.network).derive(0).derive(index).publicKey,
+    pubkey: bjs.bip32.fromBase58(this.node, this.network).derive(change).derive(index).publicKey,
     network: this.network
   })
 
