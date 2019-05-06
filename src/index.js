@@ -1,7 +1,7 @@
 const bjs = require('bitcoinjs-lib')
     , b58 = require('bs58check')
 
-function BIP84(pub) {
+function bip84(pub) {
   // mainnet
   this.pub_types = [
 	'04b24746', // zpub
@@ -20,7 +20,7 @@ function BIP84(pub) {
   this.xpub = undefined
 }
 
-BIP84.prototype.toXPUB = function() {
+bip84.prototype.toXPUB = function() {
   let payload = b58.decode(this.pub)
     , version = payload.slice(0, 4)
     , key = payload.slice(4)
@@ -42,7 +42,7 @@ BIP84.prototype.toXPUB = function() {
   return b58.encode(buffer)
 }
 
-BIP84.prototype.getAddress = function (index) {
+bip84.prototype.getAddress = function (index) {
   this.xpub = this.toXPUB(this.pub)
 
   const payment = bjs.payments.p2wpkh({
@@ -53,4 +53,4 @@ BIP84.prototype.getAddress = function (index) {
   return payment.address
 }
 
-exports = BIP84
+exports = bip84
