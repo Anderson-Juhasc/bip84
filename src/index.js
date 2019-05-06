@@ -53,4 +53,4 @@ BIP84.prototype.getAddress = function (index) {
   return payment.address
 }
 
-exports.BIP84 = BIP84
+exports.bip84 = BIP84
