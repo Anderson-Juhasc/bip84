@@ -1,6 +1,6 @@
 {
   "name": "bip84",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "BIP84 - Derives segwit + bech32 addresses from zpub and vpub in javascript",
   "main": "./src/index.js",
   "repository": {
@@ -8,7 +8,7 @@
     "url": "https://github.com/Anderson-Juhasc/bip84"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node ./test/test.js"
   },
   "keywords": [
     "bip84"

@@ -43,7 +43,7 @@ bip84.prototype.toXPUB = function() {
 }
 
 bip84.prototype.getAddress = function (index) {
-  this.xpub = this.toXPUB(this.pub)
+  this.xpub = this.toXPUB()
 
   const payment = bjs.payments.p2wpkh({
     pubkey: bjs.bip32.fromBase58(this.xpub, this.network).derive(0).derive(index).publicKey,
