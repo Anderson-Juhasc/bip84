@@ -53,4 +53,4 @@ bip84.prototype.getAddress = function (index) {
   return payment.address
 }
 
-exports = bip84
+module.exports = bip84
