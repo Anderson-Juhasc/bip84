@@ -1,0 +1,15 @@
+{
+  "name": "bip84",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bip84.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Anderson Juhasc",
+  "license": "ISC",
+  "dependencies": {
+    "bitcoinjs-lib": "^5.0.3",
+    "bs58check": "^2.1.2"
+  }
+}
