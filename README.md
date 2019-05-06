@@ -27,3 +27,9 @@ console.log(zpub.getAddress(0))
 ## Reference
 
 [BIP 84](https://github.com/bitcoin/bips/blob/master/bip-0084.mediawiki)
+
+## Donate
+
+![alt text](https://chainflyer.bitflyer.jp/Address/QR/1NzRXQa3gL1kAVZZGMjedUqM3Z3MSDFyv6 "Donate")
+
+1NzRXQa3gL1kAVZZGMjedUqM3Z3MSDFyv6
