@@ -1,7 +1,7 @@
 const bjs = require('bitcoinjs-lib')
     , b58 = require('bs58check')
 
-function bip84(pub) {
+function BIP84(pub) {
   // mainnet
   this.pub_types = [
 	'04b24746', // zpub
@@ -53,4 +53,4 @@ BIP84.prototype.getAddress = function (index) {
   return payment.address
 }
 
-exports = bip84
+exports = BIP84
