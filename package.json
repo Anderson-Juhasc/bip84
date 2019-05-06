@@ -1,7 +1,7 @@
 {
   "name": "bip84",
-  "version": "0.0.9",
-  "description": "BIP84 - Derives segwit + bech32 addresses from zpub and vpub in javascript",
+  "version": "0.1.0",
+  "description": "BIP84 - Derives segwit + bech32 addresses from zprv/zpub and vprv/vpub in javascript",
   "main": "./src/index.js",
   "repository": {
     "type": "git",
