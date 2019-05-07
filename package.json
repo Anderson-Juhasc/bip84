@@ -1,7 +1,7 @@
 {
   "name": "bip84",
-  "version": "0.1.2",
-  "description": "BIP84 - Derives segwit + bech32 addresses from zprv/zpub and vprv/vpub in javascript",
+  "version": "0.1.3",
+  "description": "BIP84 - Derives segwit + bech32 addresses from seed, zprv/zpub and vprv/vpub in javascript",
   "main": "./src/index.js",
   "repository": {
     "type": "git",
@@ -16,6 +16,7 @@
   "author": "Anderson Juhasc",
   "license": "ISC",
   "dependencies": {
+    "bip39": "^3.0.1",
     "bitcoinjs-lib": "^5.0.3",
     "bs58check": "^2.1.2"
   }
