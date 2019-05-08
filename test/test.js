@@ -35,7 +35,7 @@ console.log('Address:', account0.getAddress(0, true))
 console.log('\n');
 
 var zpub = 'vpub5Vm8JiyeMgCWT2SqgFkoJyaovNQH8RCF3wAUKCrFAfRdVujdYubBrYUGtggtabj71XxvUQuS5r9AgT4VhGvax9gXEpdi9XBg7jHnvm1WDii'
-var account1 = new BIP84.fromZPub(zpub, true)
+var account1 = new BIP84.fromZPub(zpub)
 
 console.log("Account 1, root = m/84'/0'/0'");
 console.log('Account 1 xpub:', account1.getAccountPublic());
