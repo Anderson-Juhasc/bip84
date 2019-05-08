@@ -2,129 +2,112 @@ const bjs = require('bitcoinjs-lib')
     , b58 = require('bs58check')
     , bip39 = require('bip39')
 
-function bip84(pub, network) {
-  // mainnet
-  this.pub_types = [
+function fromSeed(seed) {
+  this.seed = bip39.mnemonicToSeedSync(seed)
+  this.network = bjs.networks.bitcoin
+}
+
+fromSeed.prototype.getRootPrivate = function () {
+  let masterPrv = bjs.bip32.fromSeed(this.seed, this.network).toBase58()
+
+  return zprv(masterPrv)
+}
+
+fromSeed.prototype.getRootPublic = function () {
+  let masterPub = bjs.bip32.fromSeed(this.seed, this.network).neutered().toBase58()
+
+  return zpub(masterPub)
+}
+
+fromSeed.prototype.deriveAccount = function (index) {
+  let keypath = "m/84'/0'" + '/' + index + "'"
+  let masterPrv = bjs.bip32.fromSeed(this.seed, this.network).derivePath(keypath).toBase58()
+
+  return zprv(masterPrv)
+}
+
+fromSeed.prototype.getRootPrivate = function () {
+  let masterPrv = bjs.bip32.fromSeed(this.seed, this.network).toBase58()
+
+  return zpub(masterPrv)
+}
+
+function toNode(pub) {
+  var pub_types = [
     '04b2430c', // zprv
     '04b24746', // zpub
   ]
 
   // testnet
-  this.pub_types_testnet = [
+  var pub_types_testnet = [
     '045f18bc', // vprv
     '045f1cf6', // vpub
   ]
 
-  this.network = network && network === 'testnet' ? bjs.networks.testnet : bjs.networks.bitcoin
-  this.pub = pub
-  this.node = this.toNode()
-}
-
-// this function takes zpub/vpub and turns into xpub
-bip84.prototype.toNode = function() {
-  if (bip39.validateMnemonic(this.pub)) {
-    return bip39.mnemonicToSeedSync(this.pub)
-  }
-
-  let payload = b58.decode(this.pub)
+  let payload = b58.decode(pub)
     , version = payload.slice(0, 4)
     , key = payload.slice(4)
     , buffer = undefined
 
-  if (!this.pub_types.includes(version.toString('hex')) && !this.pub_types_testnet.includes(version.toString('hex'))) {
+  if (!pub_types.includes(version.toString('hex')) && !pub_types_testnet.includes(version.toString('hex'))) {
     throw new Error('prefix is not supported')
   }
 
-  if (this.pub_types.includes(version.toString('hex'))) {
+  if (pub_types.includes(version.toString('hex'))) {
     buffer = version.toString('hex') === '04b2430c' ?
       Buffer.concat([Buffer.from('0488ade4','hex'), key]) : // xprv
         Buffer.concat([Buffer.from('0488b21e','hex'), key]) // xpub
-
-    this.network = bjs.networks.bitcoin
   }
 
-  if (this.pub_types_testnet.includes(version.toString('hex'))) {
+  if (pub_types_testnet.includes(version.toString('hex'))) {
     buffer = version.toString('hex') === '045f18bc' ?
       Buffer.concat([Buffer.from('04358394','hex'), key]) : // tprv
         Buffer.concat([Buffer.from('043587cf','hex'), key]) // tpub
-
-    this.network = bjs.networks.testnet
   }
 
   return b58.encode(buffer)
 }
 
-bip84.prototype.zprv = function (pub) {
-  let payload = b58.decode(pub)
-    , version = payload.slice(0, 4)
-    , key = payload.slice(4)
-
-  return b58.encode(Buffer.concat([Buffer.from('04b2430c','hex'), key]))
+function fromZPrv(zprv) {
+  this.zprv = toNode(zprv)
+  this.network = bjs.networks.bitcoin
 }
 
-bip84.prototype.zpub = function (pub) {
-  let payload = b58.decode(pub)
-    , version = payload.slice(0, 4)
-    , key = payload.slice(4)
+fromZPrv.prototype.getAccountPrivate = function () {
+  let masterPrv = bjs.bip32.fromBase58(this.zprv, this.network).toBase58()
 
-  return b58.encode(Buffer.concat([Buffer.from('04b24746','hex'), key]))
+  return zprv(masterPrv)
 }
 
-bip84.prototype.getRootPrivate = function () {
-  let account = bip39.validateMnemonic(this.pub) ?
-        bjs.bip32.fromSeed(this.node).toBase58() :
-          bjs.bip32.fromBase58(this.node, this.network).toBase58()
+fromZPrv.prototype.getAccountPublic = function () {
+  let masterPub = bjs.bip32.fromBase58(this.zprv, this.network).neutered().toBase58()
 
-  return this.zprv(account)
+  return zpub(masterPub)
 }
 
-bip84.prototype.getRootPublic = function () {
-  let account = bip39.validateMnemonic(this.pub) ?
-        bjs.bip32.fromSeed(this.node).neutered().toBase58() :
-          bjs.bip32.fromBase58(this.node, this.network).neutered().toBase58()
-
-  return this.zpub(account)
-}
-
-bip84.prototype.deriveAccount = function (index) {
-  let account = bip39.validateMnemonic(this.pub) ?
-        bjs.bip32.fromSeed(this.node).derivePath("m/84'/0'/" + index + "'").toBase58() :
-          bjs.bip32.fromBase58(this.node, this.network).derivePath("m/84'/0'/" + index + "'")
-
-  return this.zprv(account)
-}
-
-bip84.prototype.getPrivateKey = function (index, isChange) {
+fromZPrv.prototype.getPrivateKey = function (index, isChange) {
   isChange = isChange !== true ? false : true
 
-  let change = isChange ? 1 : 0
-
-  let prvkey = bip39.validateMnemonic(this.pub) ?
-                 bjs.bip32.fromSeed(this.node).derivePath("m/84'/0'/0'").derive(change).derive(index) :
-                   bjs.bip32.fromBase58(this.node, this.network).derive(change).derive(index)
+  let change = isChange !== true ? 0 : 1
+    , prvkey = bjs.bip32.fromBase58(this.zprv, this.network).derive(change).derive(index)
 
   return prvkey.toWIF()
 }
 
-bip84.prototype.getPublicKey = function (index, isChange) {
+fromZPrv.prototype.getPublicKey = function (index, isChange) {
   isChange = isChange !== true ? false : true
 
-  let change = isChange ? 1 : 0
-    , pubkey = bip39.validateMnemonic(this.pub) ?
-                 bjs.bip32.fromSeed(this.node).derivePath("m/84'/0'/0'").derive(change).derive(index).publicKey :
-                   bjs.bip32.fromBase58(this.node, this.network).derive(change).derive(index).publicKey
+  let change = isChange !== true ? 0 : 1
+    , prvkey = bjs.bip32.fromBase58(this.zprv, this.network).derive(change).derive(index)
 
-  return pubkey.toString('hex')
+  return prvkey.publicKey.toString('hex')
 }
 
-// this function takes an index, and turns the pubkey of that node into a Segwit bech32 address
-bip84.prototype.getAddress = function (index, isChange) {
+fromZPrv.prototype.getAddress = function (index, isChange) {
   isChange = isChange !== true ? false : true
 
-  let change = isChange ? 1 : 0
-    , pubkey = bip39.validateMnemonic(this.pub) ?
-                 bjs.bip32.fromSeed(this.node).derivePath("m/84'/0'/0'").derive(change).derive(index).publicKey :
-                   bjs.bip32.fromBase58(this.node, this.network).derive(change).derive(index).publicKey
+  let change = isChange !== true ? 0 : 1
+    , pubkey = bjs.bip32.fromBase58(this.zprv, this.network).derive(change).derive(index).publicKey
 
   const payment = bjs.payments.p2wpkh({
     pubkey: pubkey,
@@ -134,4 +117,58 @@ bip84.prototype.getAddress = function (index, isChange) {
   return payment.address
 }
 
-module.exports = bip84
+function fromZPub(zpub) {
+  this.zpub = toNode(zpub)
+  this.network = bjs.networks.bitcoin
+}
+
+fromZPub.prototype.getAccountPublic = function () {
+  let masterPub = bjs.bip32.fromBase58(this.zpub, this.network).neutered().toBase58()
+
+  return zpub(masterPub)
+}
+
+fromZPub.prototype.getPublicKey = function (index, isChange) {
+  isChange = isChange !== true ? false : true
+
+  let change = isChange !== true ? 0 : 1
+    , zpub = bjs.bip32.fromBase58(this.zpub, this.network).derive(change).derive(index)
+
+  return zpub.publicKey.toString('hex')
+}
+
+fromZPub.prototype.getAddress = function (index, isChange) {
+  isChange = isChange !== true ? false : true
+
+  let change = isChange !== true ? 0 : 1
+    , pubkey = bjs.bip32.fromBase58(this.zpub, this.network).derive(change).derive(index).publicKey
+
+  const payment = bjs.payments.p2wpkh({
+    pubkey: pubkey,
+    network: this.network
+  })
+
+  return payment.address
+}
+
+function zprv(pub) {
+  let payload = b58.decode(pub)
+    , version = payload.slice(0, 4)
+    , key = payload.slice(4)
+
+  return b58.encode(Buffer.concat([Buffer.from('04b2430c','hex'), key]))
+}
+
+function zpub(pub) {
+  let payload = b58.decode(pub)
+    , version = payload.slice(0, 4)
+    , key = payload.slice(4)
+
+  return b58.encode(Buffer.concat([Buffer.from('04b24746','hex'), key]))
+}
+
+module.exports = {
+  fromSeed: fromSeed,
+  fromZPrv: fromZPrv,
+  fromZPub: fromZPub
+}
