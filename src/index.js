@@ -2,34 +2,35 @@ const bjs = require('bitcoinjs-lib')
     , b58 = require('bs58check')
     , bip39 = require('bip39')
 
-function fromSeed(seed) {
+function fromSeed(seed, network) {
   this.seed = bip39.mnemonicToSeedSync(seed)
-  this.network = bjs.networks.bitcoin
+  this.isTestnet = network === true ? true : false
+  this.network = network === true ? bjs.networks.testnet : bjs.networks.bitcoin
 }
 
 fromSeed.prototype.getRootPrivate = function () {
-  let masterPrv = bjs.bip32.fromSeed(this.seed, this.network).toBase58()
+  let masterPrv = this.isTestnet ?
+                    vprv(bjs.bip32.fromSeed(this.seed, this.network).toBase58()) :
+                      zprv(bjs.bip32.fromSeed(this.seed, this.network).toBase58())
 
-  return zprv(masterPrv)
+  return masterPrv
 }
 
 fromSeed.prototype.getRootPublic = function () {
-  let masterPub = bjs.bip32.fromSeed(this.seed, this.network).neutered().toBase58()
+  let masterPub = this.isTestnet ?
+                    vpub(bjs.bip32.fromSeed(this.seed, this.network).neutered().toBase58()) :
+                      zpub(bjs.bip32.fromSeed(this.seed, this.network).neutered().toBase58())
 
-  return zpub(masterPub)
+  return masterPub
 }
 
 fromSeed.prototype.deriveAccount = function (index) {
   let keypath = "m/84'/0'" + '/' + index + "'"
-  let masterPrv = bjs.bip32.fromSeed(this.seed, this.network).derivePath(keypath).toBase58()
+  let masterPrv = this.isTestnet ?
+                    vprv(bjs.bip32.fromSeed(this.seed, this.network).derivePath(keypath).toBase58()) :
+                      zprv(bjs.bip32.fromSeed(this.seed, this.network).derivePath(keypath).toBase58())
 
-  return zprv(masterPrv)
-}
-
-fromSeed.prototype.getRootPrivate = function () {
-  let masterPrv = bjs.bip32.fromSeed(this.seed, this.network).toBase58()
-
-  return zpub(masterPrv)
+  return masterPrv
 }
 
 function toNode(pub) {
@@ -68,21 +69,26 @@ function toNode(pub) {
   return b58.encode(buffer)
 }
 
-function fromZPrv(zprv) {
+function fromZPrv(zprv, network) {
   this.zprv = toNode(zprv)
-  this.network = bjs.networks.bitcoin
+  this.isTestnet = network === true ? true : false
+  this.network = network === true ? bjs.networks.testnet : bjs.networks.bitcoin
 }
 
 fromZPrv.prototype.getAccountPrivate = function () {
-  let masterPrv = bjs.bip32.fromBase58(this.zprv, this.network).toBase58()
+  let masterPrv = this.isTestnet ?
+                    vprv(bjs.bip32.fromBase58(this.zprv, this.network).toBase58()) :
+                      zprv(bjs.bip32.fromBase58(this.zprv, this.network).toBase58())
 
-  return zprv(masterPrv)
+  return masterPrv
 }
 
 fromZPrv.prototype.getAccountPublic = function () {
-  let masterPub = bjs.bip32.fromBase58(this.zprv, this.network).neutered().toBase58()
+  let masterPub = this.isTestnet ?
+                    vpub(bjs.bip32.fromBase58(this.zprv, this.network).neutered().toBase58()) :
+                      zpub(bjs.bip32.fromBase58(this.zprv, this.network).neutered().toBase58())
 
-  return zpub(masterPub)
+  return masterPub
 }
 
 fromZPrv.prototype.getPrivateKey = function (index, isChange) {
@@ -117,15 +123,18 @@ fromZPrv.prototype.getAddress = function (index, isChange) {
   return payment.address
 }
 
-function fromZPub(zpub) {
+function fromZPub(zpub, network) {
   this.zpub = toNode(zpub)
-  this.network = bjs.networks.bitcoin
+  this.isTestnet = network === true ? true : false
+  this.network = network === true ? bjs.networks.testnet : bjs.networks.bitcoin
 }
 
 fromZPub.prototype.getAccountPublic = function () {
-  let masterPub = bjs.bip32.fromBase58(this.zpub, this.network).neutered().toBase58()
+  let masterPub = this.isTestnet ?
+                    vpub(bjs.bip32.fromBase58(this.zpub, this.network).neutered().toBase58()) :
+                      zpub(bjs.bip32.fromBase58(this.zpub, this.network).neutered().toBase58())
 
-  return zpub(masterPub)
+  return masterPub
 }
 
 fromZPub.prototype.getPublicKey = function (index, isChange) {
@@ -165,6 +174,22 @@ function zpub(pub) {
     , key = payload.slice(4)
 
   return b58.encode(Buffer.concat([Buffer.from('04b24746','hex'), key]))
+}
+
+function vprv(pub) {
+  let payload = b58.decode(pub)
+    , version = payload.slice(0, 4)
+    , key = payload.slice(4)
+
+  return b58.encode(Buffer.concat([Buffer.from('045f18bc','hex'), key]))
+}
+
+function vpub(pub) {
+  let payload = b58.decode(pub)
+    , version = payload.slice(0, 4)
+    , key = payload.slice(4)
+
+  return b58.encode(Buffer.concat([Buffer.from('045f1cf6','hex'), key]))
 }
 
 module.exports = {

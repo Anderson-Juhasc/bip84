@@ -65,9 +65,6 @@ console.log('Pubkey:', account1.getPublicKey(0, true))
 console.log('Address:', account1.getAddress(0, true))
 console.log('\n');
 ```
-## TODO
-
-- Run on testnet
 
 ## Reference
 
