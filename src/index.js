@@ -13,6 +13,12 @@ const pub_types_testnet = [
   '045f1cf6', // vpub
 ]
 
+/**
+ * Constructor
+ * Derive accounts from a seed.
+ * @param {string} seed
+ * @param {boolean} network
+ */
 function fromSeed(seed, network) {
   this.seed = bip39.mnemonicToSeedSync(seed)
   this.isTestnet = network === true ? true : false
@@ -44,6 +50,11 @@ fromSeed.prototype.deriveAccount = function (index) {
   return masterPrv
 }
 
+/**
+ * Constructor
+ * Create key pairs from a private master key.
+ * @param {string} zprv/vprv
+ */
 function fromZPrv(zprv) {
   this.network = undefined
   this.isTestnet = undefined
@@ -61,18 +72,14 @@ fromZPrv.prototype.toNode = function (zprv) {
   }
 
   if (pub_types.includes(version.toString('hex'))) {
-    buffer = version.toString('hex') === '04b2430c' ?
-      Buffer.concat([Buffer.from('0488ade4','hex'), key]) : // xprv
-        Buffer.concat([Buffer.from('0488b21e','hex'), key]) // xpub
+    buffer = Buffer.concat([Buffer.from('0488ade4','hex'), key]) // xprv
 
     this.network = bjs.networks.bitcoin
     this.isTestnet = false
   }
 
   if (pub_types_testnet.includes(version.toString('hex'))) {
-    buffer = version.toString('hex') === '045f18bc' ?
-      Buffer.concat([Buffer.from('04358394','hex'), key]) : // tprv
-        Buffer.concat([Buffer.from('043587cf','hex'), key]) // tpub
+    buffer = Buffer.concat([Buffer.from('04358394','hex'), key]) // tprv
 
     this.network = bjs.networks.testnet
     this.isTestnet = true
@@ -129,6 +136,11 @@ fromZPrv.prototype.getAddress = function (index, isChange) {
   return payment.address
 }
 
+/**
+ * Constructor
+ * Create public keys and addresses from a public master key.
+ * @param {string} zpub/vpub
+ */
 function fromZPub(zpub) {
   this.network = undefined
   this.isTestnet = undefined
@@ -146,18 +158,14 @@ fromZPub.prototype.toNode = function (zpub) {
   }
 
   if (pub_types.includes(version.toString('hex'))) {
-    buffer = version.toString('hex') === '04b2430c' ?
-      Buffer.concat([Buffer.from('0488ade4','hex'), key]) : // xprv
-        Buffer.concat([Buffer.from('0488b21e','hex'), key]) // xpub
+    buffer = Buffer.concat([Buffer.from('0488b21e','hex'), key]) // xpub
 
     this.network = bjs.networks.bitcoin
     this.isTestnet = false
   }
 
   if (pub_types_testnet.includes(version.toString('hex'))) {
-    buffer = version.toString('hex') === '045f18bc' ?
-      Buffer.concat([Buffer.from('04358394','hex'), key]) : // tprv
-        Buffer.concat([Buffer.from('043587cf','hex'), key]) // tpub
+    buffer = Buffer.concat([Buffer.from('043587cf','hex'), key]) // tpub
 
     this.network = bjs.networks.testnet
     this.isTestnet = true
