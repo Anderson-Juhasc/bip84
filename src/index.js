@@ -10,16 +10,15 @@ const bjs = require('bitcoinjs-lib')
  * @param {boolean} network
  */
 function fromSeed(seed, network, testnet, slip44) {
-  this.seed = bip39.mnemonicToSeedSync(seed)
-  this.isTestnet = testnet === true ? true : false
-  this.slip44 = slip44 !== null? slip44: 0;
-  if(network !== null){
+  this.seed = bip39.mnemonicToSeedSync(seed);
+  this.isTestnet = testnet === true
+  this.slip44 = slip44 !== null ? slip44 : 0;
+  if (network !== null) {
     this.network = network; // assume to be bjs.network type
-  }
-  else{
-    if(testnet){
+  } else {
+    if (testnet) {
       this.network = bjs.networks.testnet;
-    } else{
+    } else {
       this.network = bjs.networks.bitcoin;
     }
   }
