@@ -97,7 +97,7 @@ fromZPrv.prototype.toNode = function (zprv) {
     , key = payload.slice(4)
     , buffer = undefined
 
-  buffer = Buffer.concat([this.network.bip32.private, key])
+  buffer = Buffer.concat([Buffer.from(this.network.bip32.zprv, 'hex'), key])
   return b58.encode(buffer)
 }
 
