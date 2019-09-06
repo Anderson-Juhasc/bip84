@@ -49,29 +49,6 @@ fromSeed.prototype.deriveAccount = function (index) {
   return masterPrv
 }
 
-fromSeed.prototype.derivePublicKey = function (index, isChange) {
-  isChange = isChange !== true ? false : true
-
-  let change = isChange !== true ? 0 : 1
-    , pub = bjs.bip32.fromBase58(this.deriveAccount(index), this.network).derive(change).derive(index)
-
-  return pub.publicKey.toString('hex')
-}
-
-fromSeed.prototype.deriveAddress = function (index, isChange) {
-  isChange = isChange !== true ? false : true
-
-  let change = isChange !== true ? 0 : 1
-    , pubkey = bjs.bip32.fromBase58(this.deriveAccount(index), this.network).derive(change).derive(index).publicKey
-
-  const payment = bjs.payments.p2wpkh({
-    pubkey: pubkey,
-    network: this.network
-  })
-
-  return payment.address
-}
-
 /**
  * Constructor
  * Create key pairs from a private master key.
@@ -97,7 +74,9 @@ fromZPrv.prototype.toNode = function (zprv) {
     , key = payload.slice(4)
     , buffer = undefined
 
-  buffer = Buffer.concat([Buffer.from(this.network.bip32.zprv, 'hex'), key])
+  const buf = Buffer.allocUnsafe(4);
+  buf.writeInt32BE(this.network.bip32.private, 0);
+  buffer = Buffer.concat([buf, key])
   return b58.encode(buffer)
 }
 
