@@ -9,7 +9,7 @@ const bjs = require('bitcoinjs-lib')
  * @param {string} seed
  * @param {boolean} network
  */
-function fromSeed(seed, network, testnet, slip44) {
+function fromSeed(seed, network, testnet = false, slip44 = 1) {
   this.seed = bip39.mnemonicToSeedSync(seed);
   this.isTestnet = testnet === true
   this.slip44 = slip44 !== null ? slip44 : 0;
@@ -54,12 +54,11 @@ fromSeed.prototype.deriveAccount = function (index) {
  * Create key pairs from a private master key.
  * @param {string} zprv/vprv
  */
-function fromZPrv(zprv, network, testnet) {
-  this.isTestnet = testnet === true ? true : false
-  if(network !== null){
+function fromZPrv(zprv, network = null, testnet = false) {
+  this.isTestnet = testnet === true
+  if (network !== null){
     this.network = network; // assume to be bjs.network type
-  }
-  else{
+  } else {
     if(testnet){
       this.network = bjs.networks.testnet;
     } else{
@@ -133,12 +132,11 @@ fromZPrv.prototype.getAddress = function (index, isChange) {
  * Create public keys and addresses from a public master key.
  * @param {string} zpub/vpub
  */
-function fromZPub(zpub, network, testnet) {
-  this.isTestnet = testnet === true ? true : false
+function fromZPub(zpub, network = null, testnet = false) {
+  this.isTestnet = testnet === true
   if(network !== null){
     this.network = network; // assume to be bjs.network type
-  }
-  else{
+  } else {
     if(testnet){
       this.network = bjs.networks.testnet;
     } else{
@@ -153,9 +151,10 @@ fromZPub.prototype.toNode = function (zpub) {
     , key = payload.slice(4)
     , buffer = undefined
 
-  
-  buffer = Buffer.concat([this.network.bip32.public, key])
 
+  const buf = Buffer.allocUnsafe(4);
+  buf.writeInt32BE(this.network.bip32.public, 0);
+  buffer = Buffer.concat([buf, key])
   return b58.encode(buffer)
 }
 
