@@ -9,7 +9,7 @@ const bjs = require('bitcoinjs-lib')
  * @param {string} seed
  * @param {boolean} network
  */
-function fromSeed(seed, network, testnet = false, slip44 = 1) {
+function fromSeed(seed, network, testnet = false, slip44 = 0) {
   this.seed = bip39.mnemonicToSeedSync(seed);
   this.isTestnet = testnet === true
   this.slip44 = slip44 !== null ? slip44 : 0;

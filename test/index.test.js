@@ -24,26 +24,26 @@ describe('btc tests', () => {
     });
 
     it("Generates correct root = m/84'/0'/0'", () => {
-      expect(data.account0.getAccountPrivate()).toEqual('xprv9xmnwVv4jGS2pytAGTb7myJxLRVhHByZeiZmyyZgX9oSSHSuLiXHR3t1wBuK3c6dMe5mCyT4BMNwdWmTs58nohJTTx7Rw6WZxoRNKD4TPvx');
-      expect(data.account0.getAccountPublic()).toEqual('xpub6Bm9M1SxZdzL3TxdNV8897FgtTLBgehR1wVNnMyJ5VLRK5n3tFqXxrCVnVQj4zooN4eFSkf6Sma84reWc5ZCXMxPbLXQs3BcaBdTd4YQa3B');
+      expect(data.account0.getAccountPrivate()).toEqual('xprv9ybY78BftS5UGANki6oSifuQEjkpyAC8ZmBvBNTshQnCBcxnefjHS7buPMkkqhcRzmoGZ5bokx7GuyDAiktd5HemohAU4wV1ZPMDRmLpBMm');
+      expect(data.account0.getAccountPublic()).toEqual('xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XyuvPEbvqAQY3rAPshWcMLoP2fMFMKHPJ4ZeZXYVUhLv1VMrjPC7PW6V');
     });
 
     it("Generates correct first receiving address = m/84'/0'/0'/0/0", () => {
-      expect(data.account0.getPrivateKey(0)).toEqual('L2uiLxH1HL8e6ibriKqeFan6BzrUAVP5icCif86VMHabHPxdAXYN');
-      expect(data.account0.getPublicKey(0)).toEqual('02e7ab2537b5d49e970309aae06e9e49f36ce1c9febbd44ec8e0d1cca0b4f9c319');
-      expect(data.account0.getAddress(0)).toEqual('bc1q6rz28mcfaxtmd6v789l9rrlrusdprr9p276ldv');
+      expect(data.account0.getPrivateKey(0)).toEqual('KyZpNDKnfs94vbrwhJneDi77V6jF64PWPF8x5cdJb8ifgg2DUc9d');
+      expect(data.account0.getPublicKey(0)).toEqual('0330d54fd0dd420a6e5f8d3624f5f3482cae350f79d5f0753bf5beef9c2d91af3c');
+      expect(data.account0.getAddress(0)).toEqual('bc1qcr8te4kr609gcawutmrza0j4xv80jy8z306fyu');
     });
 
     it("Generates correct second receiving address = m/84'/0'/0'/0/1", () => {
-      expect(data.account0.getPrivateKey(1)).toEqual('KytVKirxjufK4bouVKY5APx5S8hGCi5WMCSQuXeu8vhtaQHUYZXa');
-      expect(data.account0.getPublicKey(1)).toEqual('03eeed205a69022fed4a62a02457f3699b19c06bf74bf801acc6d9ae84bc16a9e1');
-      expect(data.account0.getAddress(1)).toEqual('bc1qd7spv5q28348xl4myc8zmh983w5jx32cc3dq7d');
+      expect(data.account0.getPrivateKey(1)).toEqual('Kxpf5b8p3qX56DKEe5NqWbNUP9MnqoRFzZwHRtsFqhzuvUJsYZCy');
+      expect(data.account0.getPublicKey(1)).toEqual('03e775fd51f0dfb8cd865d9ff1cca2a158cf651fe997fdc9fee9c1d3b5e995ea77');
+      expect(data.account0.getAddress(1)).toEqual('bc1qnjg0jd8228aq7egyzacy8cys3knf9xvrerkf9g');
     });
 
     it("Generates correct first change address = m/84'/0'/0'/1/0", () => {
-      expect(data.account0.getPrivateKey(0, true)).toEqual('KyiU9zk4krEpS8By6txQCca6ynTzSQsUfFVkjtAGGz9DixZgc28V');
-      expect(data.account0.getPublicKey(0, true)).toEqual('035d49eccd54d0099e43676277c7a6d4625d611da88a5df49bf9517a7791a777a5');
-      expect(data.account0.getAddress(0, true)).toEqual('bc1q9u62588spffmq4dzjxsr5l297znf3z6j783fu5');
+      expect(data.account0.getPrivateKey(0, true)).toEqual('KxuoxufJL5csa1Wieb2kp29VNdn92Us8CoaUG3aGtPtcF3AzeXvF');
+      expect(data.account0.getPublicKey(0, true)).toEqual('03025324888e429ab8e3dbaf1f7802648b9cd01e9b418485c5fa4c1b9b5700e1a6');
+      expect(data.account0.getAddress(0, true)).toEqual('bc1q8c6fshw2dlwun7ekn9qwf37cu2rn755upcp6el');
     });
   });
 
@@ -76,7 +76,7 @@ describe('btc tests', () => {
   describe('network specific', () => {
     it("Creates BTC network data", () => {
       let data = init();
-      expect(data.account0.getAddress(0)).toEqual('bc1q6rz28mcfaxtmd6v789l9rrlrusdprr9p276ldv');
+      expect(data.account0.getAddress(0)).toEqual('bc1qcr8te4kr609gcawutmrza0j4xv80jy8z306fyu');
     });
 
     it("Creates SYS network data", () => {
