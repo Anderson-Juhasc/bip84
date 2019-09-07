@@ -3,7 +3,7 @@ module.exports = {
     "node_modules",
     "dist"
   ],
-  testRegex: "(/tests/.*|(\\.|/)(test|spec))\\.(js)$",
+  testRegex: "(/tests/.*|(\\.|/)(spec))\\.(js)$",
   moduleFileExtensions: ["js", "jsx", "json", "node"],
   collectCoverage: true
 };
