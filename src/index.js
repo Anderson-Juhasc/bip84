@@ -61,7 +61,7 @@ fromSeed.prototype.deriveAccount = function (index) {
  */
 function fromZPrv(zprv, networks, pub_types, testnet) {
   this.isTestnet = testnet === true
-  this.pub_types = { mainnet: bitcoinPubTypes, testnet: bitcoinTestnetPubTypes };
+  this.pub_types = pub_types || { mainnet: bitcoinPubTypes, testnet: bitcoinTestnetPubTypes };
   this.networks = networks || { mainnet: bjs.networks.bitcoin, testnet: bjs.networks.testnet };
   this.network = undefined;
   this.zprv = this.toNode(zprv)
