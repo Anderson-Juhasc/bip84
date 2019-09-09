@@ -96,7 +96,7 @@ describe('btc tests', () => {
 
     it("Creates SYS network data", () => {
       let networks = require('./networks').syscoin;
-      let pub_types = { mainnet: { zprv: '04b2430c', zpub: '04b24746'}, testnet: { vprv: '04358394', vpub: '043587cf' }};
+      let pub_types = { mainnet: { zprv: '04b2430c', zpub: '04b24746'}, testnet: { vprv: '045f18bc', vpub: '045f1cf6' }};
       let data = init(networks, 57, pub_types);
       expect(data.account0.getAddress(0)).toEqual('sys1q2fs58xaj4tp7qrr3slpdsm65j3nw030d246lmx');
     });
