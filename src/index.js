@@ -2,8 +2,8 @@ const bjs = require('bitcoinjs-lib')
     , b58 = require('bs58check')
     , bip39 = require('bip39')
 
-const bitcoinPubTypes = { prv: '04b2430c', pub: '04b24746'};
-const bitcoinTestnetPubTypes = { prv: '045f18bc', pub: '045f1cf6'};
+const bitcoinPubTypes = { zprv: '04b2430c', zpub: '04b24746'};
+const bitcoinTestnetPubTypes = { vprv: '045f18bc', vpub: '045f1cf6'};
 
 /**
  * Constructor
@@ -17,7 +17,7 @@ function fromSeed(seed, network, slip44, pub_types, testnet) {
   this.seed = bip39.mnemonicToSeedSync(seed);
   this.isTestnet = testnet === true
   this.slip44 = slip44 ? slip44 : 0;
-  this.pub_types = { mainnet: bitcoinPubTypes, testnet: bitcoinTestnetPubTypes };
+  this.pub_types = pub_types || { mainnet: bitcoinPubTypes, testnet: bitcoinTestnetPubTypes };
 
   if (network) {
     this.network = network; // assume to be bjs.network type
@@ -28,16 +28,16 @@ function fromSeed(seed, network, slip44, pub_types, testnet) {
 
 fromSeed.prototype.getRootPrivate = function () {
   let masterPrv = this.isTestnet ?
-                    vprv(bjs.bip32.fromSeed(this.seed, this.network).toBase58(), this.pub_types.testnet.prv) :
-                      zprv(bjs.bip32.fromSeed(this.seed, this.network).toBase58(), this.pub_types.mainnet.prv)
+                    vprv(bjs.bip32.fromSeed(this.seed, this.network).toBase58(), this.pub_types.testnet.vprv) :
+                      zprv(bjs.bip32.fromSeed(this.seed, this.network).toBase58(), this.pub_types.mainnet.zprv)
 
   return masterPrv
 }
 
 fromSeed.prototype.getRootPublic = function () {
   let masterPub = this.isTestnet ?
-                    vpub(bjs.bip32.fromSeed(this.seed, this.network).neutered().toBase58(), this.pub_types.testnet.pub) :
-                      zpub(bjs.bip32.fromSeed(this.seed, this.network).neutered().toBase58(), this.pub_types.mainnet.pub)
+                    vpub(bjs.bip32.fromSeed(this.seed, this.network).neutered().toBase58(), this.pub_types.testnet.vpub) :
+                      zpub(bjs.bip32.fromSeed(this.seed, this.network).neutered().toBase58(), this.pub_types.mainnet.zpub)
 
   return masterPub
 }
@@ -45,8 +45,8 @@ fromSeed.prototype.getRootPublic = function () {
 fromSeed.prototype.deriveAccount = function (index) {
   let keypath = "m/84'/" + this.slip44 + "'/" + index + "'"
   let masterPrv = this.isTestnet ?
-                    vprv(bjs.bip32.fromSeed(this.seed, this.network).derivePath(keypath).toBase58(), this.pub_types.testnet.prv) :
-                      zprv(bjs.bip32.fromSeed(this.seed, this.network).derivePath(keypath).toBase58(),  this.pub_types.mainnet.prv)
+                    vprv(bjs.bip32.fromSeed(this.seed, this.network).derivePath(keypath).toBase58(), this.pub_types.testnet.vprv) :
+                      zprv(bjs.bip32.fromSeed(this.seed, this.network).derivePath(keypath).toBase58(),  this.pub_types.mainnet.zprv)
 
   return masterPrv
 }
@@ -98,16 +98,16 @@ fromZPrv.prototype.toNode = function (zprv) {
 
 fromZPrv.prototype.getAccountPrivate = function () {
   let masterPrv = this.isTestnet ?
-                    vprv(bjs.bip32.fromBase58(this.zprv, this.network).toBase58(), this.pub_types.testnet.prv) :
-                      zprv(bjs.bip32.fromBase58(this.zprv, this.network).toBase58(), this.pub_types.mainnet.prv)
+                    vprv(bjs.bip32.fromBase58(this.zprv, this.network).toBase58(), this.pub_types.testnet.vprv) :
+                      zprv(bjs.bip32.fromBase58(this.zprv, this.network).toBase58(), this.pub_types.mainnet.zprv)
 
   return masterPrv
 }
 
 fromZPrv.prototype.getAccountPublic = function () {
   let masterPub = this.isTestnet ?
-                    vpub(bjs.bip32.fromBase58(this.zprv, this.network).neutered().toBase58(), this.pub_types.testnet.pub) :
-                      zpub(bjs.bip32.fromBase58(this.zprv, this.network).neutered().toBase58(), this.pub_types.mainnet.pub)
+                    vpub(bjs.bip32.fromBase58(this.zprv, this.network).neutered().toBase58(), this.pub_types.testnet.vpub) :
+                      zpub(bjs.bip32.fromBase58(this.zprv, this.network).neutered().toBase58(), this.pub_types.mainnet.zpub)
 
   return masterPub
 }
@@ -142,6 +142,15 @@ fromZPrv.prototype.getAddress = function (index, isChange) {
   })
 
   return payment.address
+}
+
+fromZPrv.prototype.getKeypair = function (index, isChange) {
+  isChange = isChange !== true ? false : true
+
+  let change = isChange !== true ? 0 : 1
+    , prvkey = bjs.bip32.fromBase58(this.zprv, this.network).derive(change).derive(index)
+
+  return prvkey;
 }
 
 /**
@@ -191,8 +200,8 @@ fromZPub.prototype.toNode = function (zpub) {
 
 fromZPub.prototype.getAccountPublic = function () {
   let masterPub = this.isTestnet ?
-                    vpub(bjs.bip32.fromBase58(this.zpub, this.network).neutered().toBase58(), this.pub_types.testnet.pub) :
-                      zpub(bjs.bip32.fromBase58(this.zpub, this.network).neutered().toBase58(), this.pub_types.mainnet.pub)
+                    vpub(bjs.bip32.fromBase58(this.zpub, this.network).neutered().toBase58(), this.pub_types.testnet.vpub) :
+                      zpub(bjs.bip32.fromBase58(this.zpub, this.network).neutered().toBase58(), this.pub_types.mainnet.zpub)
 
   return masterPub
 }
@@ -218,6 +227,20 @@ fromZPub.prototype.getAddress = function (index, isChange) {
   })
 
   return payment.address
+}
+
+fromZPub.prototype.getPayment = function (index, isChange) {
+  isChange = isChange !== true ? false : true
+
+  let change = isChange !== true ? 0 : 1
+    , pubkey = bjs.bip32.fromBase58(this.zpub, this.network).derive(change).derive(index).publicKey
+
+  const payment = bjs.payments.p2wpkh({
+    pubkey: pubkey,
+    network: this.network
+  })
+
+  return payment;
 }
 
 function zprv(pub, data) {

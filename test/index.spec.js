@@ -12,7 +12,9 @@ function init(networks, slip44, pub_types, isTestnet) {
   }
 
   let root = new BIP84.fromSeed(mnemonic, network, slip44, pub_types, isTestnet);
+  console.log('root');
   let child0 = root.deriveAccount(0);
+  console.log('child');
   let account0 = new BIP84.fromZPrv(child0, networks, pub_types, isTestnet);
   return { root, child0, account0 };
 }
