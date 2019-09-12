@@ -2,8 +2,8 @@ const bjs = require('bitcoinjs-lib')
     , b58 = require('bs58check')
     , bip39 = require('bip39')
 
-const bitcoinPubTypes = { zprv: '04b2430c', zpub: '04b24746'};
-const bitcoinTestnetPubTypes = { vprv: '045f18bc', vpub: '045f1cf6'};
+const bitcoinPubTypes = { zprv: '04b2430c', zpub: '04b24746'}
+const bitcoinTestnetPubTypes = { vprv: '045f18bc', vpub: '045f1cf6'}
 
 /**
  * Constructor
@@ -14,15 +14,15 @@ const bitcoinTestnetPubTypes = { vprv: '045f18bc', vpub: '045f1cf6'};
  * @param {boolean} testnet
  */
 function fromSeed(seed, network, slip44, pub_types, testnet) {
-  this.seed = bip39.mnemonicToSeedSync(seed);
+  this.seed = bip39.mnemonicToSeedSync(seed)
   this.isTestnet = testnet === true
-  this.slip44 = slip44 ? slip44 : 0;
-  this.pub_types = pub_types || { mainnet: bitcoinPubTypes, testnet: bitcoinTestnetPubTypes };
+  this.slip44 = slip44 ? slip44 : 0
+  this.pub_types = pub_types || { mainnet: bitcoinPubTypes, testnet: bitcoinTestnetPubTypes }
 
   if (network) {
-    this.network = network; // assume to be bjs.network type
+    this.network = network // assume to be bjs.network type
   } else {
-    this.network = testnet ? bjs.networks.testnet : bjs.networks.bitcoin;
+    this.network = testnet ? bjs.networks.testnet : bjs.networks.bitcoin
   }
 }
 
@@ -61,9 +61,9 @@ fromSeed.prototype.deriveAccount = function (index) {
  */
 function fromZPrv(zprv, networks, pub_types, testnet) {
   this.isTestnet = testnet === true
-  this.pub_types = pub_types || { mainnet: bitcoinPubTypes, testnet: bitcoinTestnetPubTypes };
-  this.networks = networks || { mainnet: bjs.networks.bitcoin, testnet: bjs.networks.testnet };
-  this.network = undefined;
+  this.pub_types = pub_types || { mainnet: bitcoinPubTypes, testnet: bitcoinTestnetPubTypes }
+  this.networks = networks || { mainnet: bjs.networks.bitcoin, testnet: bjs.networks.testnet }
+  this.network = undefined
   this.zprv = this.toNode(zprv)
 }
 
@@ -78,19 +78,19 @@ fromZPrv.prototype.toNode = function (zprv) {
   }
 
   if (Object.values(this.pub_types.mainnet).includes(version.toString('hex'))) {
-    const buf = Buffer.allocUnsafe(4);
-    buf.writeInt32BE(this.networks.mainnet.bip32.private, 0);
+    const buf = Buffer.allocUnsafe(4)
+    buf.writeInt32BE(this.networks.mainnet.bip32.private, 0)
     buffer = Buffer.concat([buf, key]) // xprv
-    this.network = this.networks.mainnet;
-    this.isTestnet = false;
+    this.network = this.networks.mainnet
+    this.isTestnet = false
   }
 
   if (Object.values(this.pub_types.testnet).includes(version.toString('hex'))) {
-    const buf = Buffer.allocUnsafe(4);
-    buf.writeInt32BE(this.networks.testnet.bip32.private, 0);
+    const buf = Buffer.allocUnsafe(4)
+    buf.writeInt32BE(this.networks.testnet.bip32.private, 0)
     buffer = Buffer.concat([buf, key]) // xprv
-    this.network = this.networks.testnet;
-    this.isTestnet = true;
+    this.network = this.networks.testnet
+    this.isTestnet = true
   }
 
   return b58.encode(buffer)
@@ -150,7 +150,7 @@ fromZPrv.prototype.getKeypair = function (index, isChange) {
   let change = isChange !== true ? 0 : 1
     , prvkey = bjs.bip32.fromBase58(this.zprv, this.network).derive(change).derive(index)
 
-  return prvkey;
+  return prvkey
 }
 
 /**
@@ -162,10 +162,10 @@ fromZPrv.prototype.getKeypair = function (index, isChange) {
  * @param {boolean} testnet
  */
 function fromZPub(zpub, networks, pub_types, testnet) {
-  this.isTestnet = testnet === true;
-  this.pub_types = pub_types || { mainnet: bitcoinPubTypes, testnet: bitcoinTestnetPubTypes };
-  this.networks = networks || { mainnet: bjs.networks.bitcoin, testnet: bjs.networks.testnet };
-  this.network = undefined;
+  this.isTestnet = testnet === true
+  this.pub_types = pub_types || { mainnet: bitcoinPubTypes, testnet: bitcoinTestnetPubTypes }
+  this.networks = networks || { mainnet: bjs.networks.bitcoin, testnet: bjs.networks.testnet }
+  this.network = undefined
   this.zpub = this.toNode(zpub)
 }
 
@@ -180,19 +180,19 @@ fromZPub.prototype.toNode = function (zpub) {
   }
 
   if (Object.values(this.pub_types.mainnet).includes(version.toString('hex'))) {
-    const buf = Buffer.allocUnsafe(4);
-    buf.writeInt32BE(this.networks.mainnet.bip32.public, 0);
+    const buf = Buffer.allocUnsafe(4)
+    buf.writeInt32BE(this.networks.mainnet.bip32.public, 0)
     buffer = Buffer.concat([buf, key]) // xprv
-    this.network = this.networks.mainnet;
-    this.isTestnet = false;
+    this.network = this.networks.mainnet
+    this.isTestnet = false
   }
 
   if (Object.values(this.pub_types.testnet).includes(version.toString('hex'))) {
-    const buf = Buffer.allocUnsafe(4);
-    buf.writeInt32BE(this.networks.testnet.bip32.public, 0);
+    const buf = Buffer.allocUnsafe(4)
+    buf.writeInt32BE(this.networks.testnet.bip32.public, 0)
     buffer = Buffer.concat([buf, key]) // xprv
-    this.network = this.networks.testnet;
-    this.isTestnet = true;
+    this.network = this.networks.testnet
+    this.isTestnet = true
   }
 
   return b58.encode(buffer)
@@ -240,7 +240,7 @@ fromZPub.prototype.getPayment = function (index, isChange) {
     network: this.network
   })
 
-  return payment;
+  return payment
 }
 
 function zprv(pub, data) {
