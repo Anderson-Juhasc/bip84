@@ -76,6 +76,7 @@ console.log('\n');
 ## Reference
 
 [BIP 84](https://github.com/bitcoin/bips/blob/master/bip-0084.mediawiki)
+[SLIP 44](https://github.com/satoshilabs/slips/blob/master/slip-0044.md)
 
 ## License terms
 
