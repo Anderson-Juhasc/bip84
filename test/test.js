@@ -5,15 +5,15 @@ var root = new BIP84.fromSeed(mnemonic)
 var child0 = root.deriveAccount(0)
 
 console.log('mnemonic:', mnemonic)
-console.log('rootpriv:', root.getRootPrivate())
-console.log('rootpub:', root.getRootPublic())
+console.log('rootpriv:', root.getRootPrivateKey())
+console.log('rootpub:', root.getRootPublicKey())
 console.log('\n');
 
 var account0 = new BIP84.fromZPrv(child0)
 
 console.log("Account 0, root = m/84'/0'/0'");
-console.log('Account 0 xprv:', account0.getAccountPrivate())
-console.log('Account 0 xpub:', account0.getAccountPublic())
+console.log('Account 0 xprv:', account0.getAccountPrivateKey())
+console.log('Account 0 xpub:', account0.getAccountPublicKey())
 console.log('\n');
 
 console.log("Account 0, first receiving address = m/84'/0'/0'/0/0");
@@ -38,7 +38,7 @@ var zpub = 'vpub5Vm8JiyeMgCWT2SqgFkoJyaovNQH8RCF3wAUKCrFAfRdVujdYubBrYUGtggtabj7
 var account1 = new BIP84.fromZPub(zpub)
 
 console.log("Account 1, root = m/84'/0'/0'");
-console.log('Account 1 xpub:', account1.getAccountPublic());
+console.log('Account 1 xpub:', account1.getAccountPublicKey());
 console.log('\n');
 
 console.log("Account 1, first receiving address = m/84'/0'/0'/0/0");

@@ -29,13 +29,13 @@ describe('account0', () => {
   });
 
   it("Generates correct rootPublic and rootPrivate", () => {
-    expect(data.root.getRootPrivate()).toEqual('zprvAWgYBBk7JR8Gjrh4UJQ2uJdG1r3WNRRfURiABBE3RvMXYSrRJL62XuezvGdPvG6GFBZduosCc1YP5wixPox7zhZLfiUm8aunE96BBa4Kei5');
-    expect(data.root.getRootPublic()).toEqual('zpub6jftahH18ngZxLmXaKw3GSZzZsszmt9WqedkyZdezFtWRFBZqsQH5hyUmb4pCEeZGmVfQuP5bedXTB8is6fTv19U1GQRyQUKQGUTzyHACMF');
+    expect(data.root.getRootPrivateKey()).toEqual('zprvAWgYBBk7JR8Gjrh4UJQ2uJdG1r3WNRRfURiABBE3RvMXYSrRJL62XuezvGdPvG6GFBZduosCc1YP5wixPox7zhZLfiUm8aunE96BBa4Kei5');
+    expect(data.root.getRootPublicKey()).toEqual('zpub6jftahH18ngZxLmXaKw3GSZzZsszmt9WqedkyZdezFtWRFBZqsQH5hyUmb4pCEeZGmVfQuP5bedXTB8is6fTv19U1GQRyQUKQGUTzyHACMF');
   });
 
   it("Generates correct root = m/84'/0'/0'", () => {
-    expect(data.account0.getAccountPrivate()).toEqual('zprvAdG4iTXWBoARxkkzNpNh8r6Qag3irQB8PzEMkAFeTRXxHpbF9z4QgEvBRmfvqWvGp42t42nvgGpNgYSJA9iefm1yYNZKEm7z6qUWCroSQnE');
-    expect(data.account0.getAccountPublic()).toEqual('zpub6rFR7y4Q2AijBEqTUquhVz398htDFrtymD9xYYfG1m4wAcvPhXNfE3EfH1r1ADqtfSdVCToUG868RvUUkgDKf31mGDtKsAYz2oz2AGutZYs');
+    expect(data.account0.getAccountPrivateKey()).toEqual('zprvAdG4iTXWBoARxkkzNpNh8r6Qag3irQB8PzEMkAFeTRXxHpbF9z4QgEvBRmfvqWvGp42t42nvgGpNgYSJA9iefm1yYNZKEm7z6qUWCroSQnE');
+    expect(data.account0.getAccountPublicKey()).toEqual('zpub6rFR7y4Q2AijBEqTUquhVz398htDFrtymD9xYYfG1m4wAcvPhXNfE3EfH1r1ADqtfSdVCToUG868RvUUkgDKf31mGDtKsAYz2oz2AGutZYs');
   });
 
   it("Generates correct first receiving address = m/84'/0'/0'/0/0", () => {
@@ -62,26 +62,26 @@ describe('account1', () => {
     account1 = initFromZpub();
   });
 
-  it("Generates correct root = m/84'/0'/0'", () => {
-    expect(account1.getAccountPublic()).toEqual('vpub5Vm8JiyeMgCWT2SqgFkoJyaovNQH8RCF3wAUKCrFAfRdVujdYubBrYUGtggtabj71XxvUQuS5r9AgT4VhGvax9gXEpdi9XBg7jHnvm1WDii');
+  it("Generates correct root = m/84'/1'/0'", () => {
+    expect(account1.getAccountPublicKey()).toEqual('vpub5Vm8JiyeMgCWT2SqgFkoJyaovNQH8RCF3wAUKCrFAfRdVujdYubBrYUGtggtabj71XxvUQuS5r9AgT4VhGvax9gXEpdi9XBg7jHnvm1WDii');
   });
 
-  it("Generates correct first receiving address = m/84'/0'/0'/0/0", () => {
+  it("Generates correct first receiving address = m/84'/1'/0'/0/0", () => {
     expect(account1.getPublicKey(0)).toEqual('02176cd6a3d74e3a4f3f9c4fe517291fae7654709db13e97f41765fd6e7e1406bb');
     expect(account1.getAddress(0)).toEqual('tb1qxdz5xktump2xt0832tgqnlhf48jrarulddvaym');
   });
 
-  it("Generates correct second receiving address = m/84'/0'/0'/0/1", () => {
+  it("Generates correct second receiving address = m/84'/1'/0'/0/1", () => {
     expect(account1.getPublicKey(1)).toEqual('03b3ca0a9f89350bbd0bbaca3e9701d71e86ae29582a9572a32404ecf4350f3964');
     expect(account1.getAddress(1)).toEqual('tb1q65v0jm4v49g33pys6wsv6enrl98vscpkr56zz9');
   });
 
-  it("Generates correct first change address = m/84'/0'/0'/1/0", () => {
+  it("Generates correct first change address = m/84'/1'/0'/1/0", () => {
     expect(account1.getPublicKey(0, true)).toEqual('03fb2a8afb6ff7d628d0742601e5016c01d387a0103fff548bbfbfe06a1bfb85f9');
     expect(account1.getAddress(0, true)).toEqual('tb1qexuaj40zxzmyqsruv0ed2lw4mhtz0mvc4cvlhd');
   });
 
-  it("Generates correct second change address = m/84'/0'/0'/1/1", () => {
+  it("Generates correct second change address = m/84'/1'/0'/1/1", () => {
     expect(account1.getPublicKey(1, true)).toEqual('03e46cb4676c6259d46f39e1ba53f7170309ea818d6b4d2fc14f959812087f5f5f');
     expect(account1.getAddress(1, true)).toEqual('tb1q97cd5cd3jp43rfcfuuv3j97t5pve7qg3eeljq8');
   });
