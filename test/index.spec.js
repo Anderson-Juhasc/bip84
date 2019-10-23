@@ -11,15 +11,15 @@ function init(networks, slip44, pub_types, isTestnet) {
     }
   }
 
-  let root = new BIP84.fromSeed(mnemonic, network, slip44, pub_types, isTestnet);
+  let root = new BIP84.fromSeed(mnemonic, isTestnet, slip44, pub_types, network);
   let child0 = root.deriveAccount(0);
-  let account0 = new BIP84.fromZPrv(child0, networks, pub_types, isTestnet);
+  let account0 = new BIP84.fromZPrv(child0, pub_types, networks);
   return { root, child0, account0 };
 }
 
 function initFromZpub(networks, slip44, pub_types, isTestnet) {
   let zpub = 'vpub5Vm8JiyeMgCWT2SqgFkoJyaovNQH8RCF3wAUKCrFAfRdVujdYubBrYUGtggtabj71XxvUQuS5r9AgT4VhGvax9gXEpdi9XBg7jHnvm1WDii'
-  return new BIP84.fromZPub(zpub, networks, pub_types, isTestnet);
+  return new BIP84.fromZPub(zpub, pub_types, networks);
 }
 
 let data, account1;

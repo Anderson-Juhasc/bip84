@@ -22,26 +22,29 @@ function fromSeed(seed, isTestnet, slip44, pubTypes, network) {
 }
 
 fromSeed.prototype.getRootPrivateKey = function () {
-  let masterPrv = this.isTestnet ?
-                    vprv(bjs.bip32.fromSeed(this.seed, this.network).toBase58(), this.pubTypes.testnet.vprv) :
-                      zprv(bjs.bip32.fromSeed(this.seed, this.network).toBase58(), this.pubTypes.mainnet.zprv)
+  let prv = bjs.bip32.fromSeed(this.seed, this.network).toBase58()
+    , masterPrv = this.isTestnet ?
+                    vprv(prv, this.pubTypes.testnet.vprv) :
+                      zprv(prv, this.pubTypes.mainnet.zprv)
 
   return masterPrv
 }
 
 fromSeed.prototype.getRootPublicKey = function () {
-  let masterPub = this.isTestnet ?
-                    vpub(bjs.bip32.fromSeed(this.seed, this.network).neutered().toBase58(), this.pubTypes.testnet.vpub) :
-                      zpub(bjs.bip32.fromSeed(this.seed, this.network).neutered().toBase58(), this.pubTypes.mainnet.zpub)
+  let pub = bjs.bip32.fromSeed(this.seed, this.network).neutered().toBase58()
+    , masterPub = this.isTestnet ?
+                    vpub(pub, this.pubTypes.testnet.vpub) :
+                      zpub(pub, this.pubTypes.mainnet.zpub)
 
   return masterPub
 }
 
 fromSeed.prototype.deriveAccount = function (index) {
   let keypath = "m/84'/" + this.slip44 + "'/" + index + "'"
-  let masterPrv = this.isTestnet ?
-                    vprv(bjs.bip32.fromSeed(this.seed, this.network).derivePath(keypath).toBase58(), this.pubTypes.testnet.vprv) :
-                      zprv(bjs.bip32.fromSeed(this.seed, this.network).derivePath(keypath).toBase58(),  this.pubTypes.mainnet.zprv)
+    , account = bjs.bip32.fromSeed(this.seed, this.network).derivePath(keypath).toBase58()
+    , masterPrv = this.isTestnet ?
+                    vprv(account, this.pubTypes.testnet.vprv) :
+                      zprv(account, this.pubTypes.mainnet.zprv)
 
   return masterPrv
 }
@@ -50,10 +53,10 @@ fromSeed.prototype.deriveAccount = function (index) {
  * Constructor
  * Create key pairs from a private master key of mainnet and testnet.
  * @param {string} zprv/vprv
- * @param {object} networks
  * @param {object} pubTypes
+ * @param {object} networks
  */
-function fromZPrv(zprv, networks, pubTypes) {
+function fromZPrv(zprv, pubTypes, networks) {
   this.pubTypes = pubTypes || bitcoinPubTypes
   this.networks = networks || bitcoinNetworks
   this.zprv = this.toNode(zprv)
@@ -72,7 +75,7 @@ fromZPrv.prototype.toNode = function (zprv) {
   if (Object.values(this.pubTypes.mainnet).includes(version.toString('hex'))) {
     const buf = Buffer.allocUnsafe(4)
     buf.writeInt32BE(this.networks.mainnet.bip32.private, 0)
-    buffer = Buffer.concat([buf, key]) // xprv
+    buffer = Buffer.concat([buf, key]) // zprv
     this.network = this.networks.mainnet
     this.isTestnet = false
   }
@@ -90,7 +93,7 @@ fromZPrv.prototype.toNode = function (zprv) {
 
 fromZPrv.prototype.getAccountPrivateKey = function () {
   let pub = bjs.bip32.fromBase58(this.zprv, this.network).toBase58()
-  let masterPrv = this.isTestnet ?
+    , masterPrv = this.isTestnet ?
                     vprv(pub, this.pubTypes.testnet.vprv) :
                       zprv(pub, this.pubTypes.mainnet.zprv)
 
@@ -165,7 +168,7 @@ fromZPub.prototype.toNode = function (zpub) {
   if (Object.values(this.pubTypes.mainnet).includes(version.toString('hex'))) {
     const buf = Buffer.allocUnsafe(4)
     buf.writeInt32BE(this.networks.mainnet.bip32.public, 0)
-    buffer = Buffer.concat([buf, key]) // xpub
+    buffer = Buffer.concat([buf, key]) // zpub
     this.network = this.networks.mainnet
     this.isTestnet = false
   }
