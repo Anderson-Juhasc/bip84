@@ -39,8 +39,9 @@ fromSeed.prototype.getRootPublicKey = function () {
   return masterPub
 }
 
-fromSeed.prototype.deriveAccount = function (index) {
-  let keypath = "m/84'/" + this.slip44 + "'/" + index + "'"
+fromSeed.prototype.deriveAccount = function (index, bipNum) {
+  let bip = bipNum || '84'
+  let keypath = "m/" + bip + "'/" + this.slip44 + "'/" + index + "'"
     , account = bjs.bip32.fromSeed(this.seed, this.network).derivePath(keypath).toBase58()
     , masterPrv = this.isTestnet ?
                     vprv(account, this.pubTypes.testnet.vprv) :
