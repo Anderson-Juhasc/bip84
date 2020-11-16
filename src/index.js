@@ -189,7 +189,7 @@ fromZPub.prototype.getAccountPublicKey = function () {
   let pub = bjs.bip32.fromBase58(this.zpub, this.network).neutered().toBase58()
   let masterPub = this.isTestnet ?
                     vpub(pub, this.pubTypes.testnet.vpub) :
-                      zpub(pubt , this.pubTypes.mainnet.zpub)
+                      zpub(pub, this.pubTypes.mainnet.zpub)
 
   return masterPub
 }
