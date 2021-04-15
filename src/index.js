@@ -4,6 +4,8 @@ const bjs = require('bitcoinjs-lib')
     , bitcoinPubTypes = { mainnet: { zprv: '04b2430c', zpub: '04b24746'}, testnet: { vprv: '045f18bc', vpub: '045f1cf6'} }
     , bitcoinNetworks = { mainnet: bjs.networks.bitcoin, testnet: bjs.networks.testnet }
 
+console.log(bitcoinNetworks)
+
 /**
  * Constructor
  * Derive accounts from a seed.
@@ -20,7 +22,7 @@ function fromSeed(mnemonic, password, isTestnet, coinType, pubTypes, network) {
   this.isTestnet = isTestnet === true
   this.coinType = this.isTestnet ? 1 : coinType ? coinType : 0 // 0 is for Bitcoin and 1 is testnet for all coins
   this.pubTypes = pubTypes || bitcoinPubTypes
-  this.network = network || this.isTestnet ? bitcoinNetworks.testnet : bitcoinNetworks.bitcoin
+  this.network = network || this.isTestnet ? bitcoinNetworks.testnet : bitcoinNetworks.mainnet
 }
 
 /**
