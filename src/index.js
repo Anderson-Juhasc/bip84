@@ -1,14 +1,12 @@
-const bjs = require('bitcoinjs-lib')
+const { bip32, networks, payments } = require('bitcoinjs-lib')
     , b58 = require('bs58check')
     , bip39 = require('bip39')
     , bitcoinPubTypes = { mainnet: { zprv: '04b2430c', zpub: '04b24746'}, testnet: { vprv: '045f18bc', vpub: '045f1cf6'} }
-    , bitcoinNetworks = { mainnet: bjs.networks.bitcoin, testnet: bjs.networks.testnet }
-
-console.log(bitcoinNetworks)
+    , bitcoinNetworks = { mainnet: networks.bitcoin, testnet: networks.testnet }
 
 /**
  * Constructor
- * Derive accounts from a seed.
+ * Derive accounts from a mnemonic.
  * @param {string} mnemonic
  * @param {string} password
  * @param {boolean} isTestnet
@@ -17,7 +15,7 @@ console.log(bitcoinNetworks)
  * @param {object} network
  * @return 
  */
-function fromSeed(mnemonic, password, isTestnet, coinType, pubTypes, network) {
+function fromMnemonic(mnemonic, password, isTestnet, coinType, pubTypes, network) {
   this.seed = bip39.mnemonicToSeedSync(mnemonic, password ? password : '')
   this.isTestnet = isTestnet === true
   this.coinType = this.isTestnet ? 1 : coinType ? coinType : 0 // 0 is for Bitcoin and 1 is testnet for all coins
@@ -29,8 +27,8 @@ function fromSeed(mnemonic, password, isTestnet, coinType, pubTypes, network) {
  * Get root master private key
  * @return {string}
  */
-fromSeed.prototype.getRootPrivateKey = function () {
-  let prv = bjs.bip32.fromSeed(this.seed, this.network).toBase58()
+fromMnemonic.prototype.getRootPrivateKey = function () {
+  let prv = bip32.fromSeed(this.seed, this.network).toBase58()
     , masterPrv = this.isTestnet ?
                     b58Encode(prv, this.pubTypes.testnet.vprv) :
                       b58Encode(prv, this.pubTypes.mainnet.zprv)
@@ -42,8 +40,8 @@ fromSeed.prototype.getRootPrivateKey = function () {
  * Get root master public key
  * @return {string}
  */
-fromSeed.prototype.getRootPublicKey = function () {
-  let pub = bjs.bip32.fromSeed(this.seed, this.network).neutered().toBase58()
+fromMnemonic.prototype.getRootPublicKey = function () {
+  let pub = bip32.fromSeed(this.seed, this.network).neutered().toBase58()
     , masterPub = this.isTestnet ?
                     b58Encode(pub, this.pubTypes.testnet.vpub) :
                       b58Encode(pub, this.pubTypes.mainnet.zpub)
@@ -57,10 +55,10 @@ fromSeed.prototype.getRootPublicKey = function () {
  * @param {number} changePurpose
  * @return {string}
  */
-fromSeed.prototype.deriveAccount = function (number, changePurpose) {
+fromMnemonic.prototype.deriveAccount = function (number, changePurpose) {
 	let purpose = changePurpose || 84
 		, keypath = "m/" + purpose + "'/" + this.coinType + "'/" + number + "'"
-    , account = bjs.bip32.fromSeed(this.seed, this.network).derivePath(keypath).toBase58()
+    , account = bip32.fromSeed(this.seed, this.network).derivePath(keypath).toBase58()
     , masterPrv = this.isTestnet ?
                     b58Encode(account, this.pubTypes.testnet.vprv) :
                       b58Encode(account, this.pubTypes.mainnet.zprv)
@@ -115,7 +113,7 @@ fromZPrv.prototype.toNode = function (zprv) {
  * @return {string}
  */
 fromZPrv.prototype.getAccountPrivateKey = function () {
-  let pub = bjs.bip32.fromBase58(this.zprv, this.network).toBase58()
+  let pub = bip32.fromBase58(this.zprv, this.network).toBase58()
     , masterPrv = this.isTestnet ?
                     b58Encode(pub, this.pubTypes.testnet.vprv) :
                       b58Encode(pub, this.pubTypes.mainnet.zprv)
@@ -128,7 +126,7 @@ fromZPrv.prototype.getAccountPrivateKey = function () {
  * @return {string}
  */
 fromZPrv.prototype.getAccountPublicKey = function () {
-  let pub = bjs.bip32.fromBase58(this.zprv, this.network).neutered().toBase58()
+  let pub = bip32.fromBase58(this.zprv, this.network).neutered().toBase58()
     , masterPub = this.isTestnet ?
                     b58Encode(pub, this.pubTypes.testnet.vpub) :
                       b58Encode(pub, this.pubTypes.mainnet.zpub)
@@ -144,7 +142,7 @@ fromZPrv.prototype.getAccountPublicKey = function () {
  */
 fromZPrv.prototype.getPrivateKey = function (index, isChange) {
   let change = isChange === true ? 1 : 0
-    , prvkey = bjs.bip32.fromBase58(this.zprv, this.network).derive(change).derive(index)
+    , prvkey = bip32.fromBase58(this.zprv, this.network).derive(change).derive(index)
 
   return prvkey.toWIF()
 }
@@ -157,7 +155,7 @@ fromZPrv.prototype.getPrivateKey = function (index, isChange) {
  */
 fromZPrv.prototype.getPublicKey = function (index, isChange) {
   let change = isChange === true ? 1 : 0
-    , prvkey = bjs.bip32.fromBase58(this.zprv, this.network).derive(change).derive(index)
+    , prvkey = bip32.fromBase58(this.zprv, this.network).derive(change).derive(index)
 
   return prvkey.publicKey.toString('hex')
 }
@@ -171,23 +169,23 @@ fromZPrv.prototype.getPublicKey = function (index, isChange) {
  */
 fromZPrv.prototype.getAddress = function (index, isChange, purpose) {
   let change = isChange === true ? 1 : 0
-    , pubkey = bjs.bip32.fromBase58(this.zprv, this.network).derive(change).derive(index).publicKey
+    , pubkey = bip32.fromBase58(this.zprv, this.network).derive(change).derive(index).publicKey
 
 	purpose = purpose || 84
 
 	if (purpose === 44) {
-		payment = bjs.payments.p2pkh({ pubkey: pubkey, network: this.network })
+		payment = payments.p2pkh({ pubkey: pubkey, network: this.network })
 	}
 
 	if (purpose === 49) {
-		payment = bjs.payments.p2sh({
-			redeem: bjs.payments.p2wpkh({ pubkey: pubkey, network: this.network }),
+		payment = payments.p2sh({
+			redeem: payments.p2wpkh({ pubkey: pubkey, network: this.network }),
 			network: this.network
 		})
 	}
 
 	if (purpose === 84) {
-		payment = bjs.payments.p2wpkh({ pubkey: pubkey, network: this.network })
+		payment = payments.p2wpkh({ pubkey: pubkey, network: this.network })
 	}
 
   return payment.address
@@ -195,7 +193,7 @@ fromZPrv.prototype.getAddress = function (index, isChange, purpose) {
 
 fromZPrv.prototype.getKeypair = function (index, isChange) {
   let change = isChange === true ? 1 : 0
-    , prvkey = bjs.bip32.fromBase58(this.zprv, this.network).derive(change).derive(index)
+    , prvkey = bip32.fromBase58(this.zprv, this.network).derive(change).derive(index)
 
   return prvkey
 }
@@ -247,7 +245,7 @@ fromZPub.prototype.toNode = function (zpub) {
  * @return {string}
  */
 fromZPub.prototype.getAccountPublicKey = function () {
-  let pub = bjs.bip32.fromBase58(this.zpub, this.network).neutered().toBase58()
+  let pub = bip32.fromBase58(this.zpub, this.network).neutered().toBase58()
   let masterPub = this.isTestnet ?
                     b58Encode(pub, this.pubTypes.testnet.vpub) :
                       b58Encode(pub, this.pubTypes.mainnet.zpub)
@@ -263,7 +261,7 @@ fromZPub.prototype.getAccountPublicKey = function () {
  */
 fromZPub.prototype.getPublicKey = function (index, isChange) {
   let change = isChange === true ? 1 : 0
-    , zpub = bjs.bip32.fromBase58(this.zpub, this.network).derive(change).derive(index)
+    , zpub = bip32.fromBase58(this.zpub, this.network).derive(change).derive(index)
 
   return zpub.publicKey.toString('hex')
 }
@@ -277,24 +275,24 @@ fromZPub.prototype.getPublicKey = function (index, isChange) {
  */
 fromZPub.prototype.getAddress = function (index, isChange, purpose) {
   let change = isChange === true ? 1 : 0
-    , pubkey = bjs.bip32.fromBase58(this.zpub, this.network).derive(change).derive(index).publicKey
+    , pubkey = bip32.fromBase58(this.zpub, this.network).derive(change).derive(index).publicKey
 		, payment = {}
 
 	purpose = purpose || 84
 
 	if (purpose === 44) {
-		payment = bjs.payments.p2pkh({ pubkey: pubkey, network: this.network })
+		payment = payments.p2pkh({ pubkey: pubkey, network: this.network })
 	}
 
 	if (purpose === 49) {
-		payment = bjs.payments.p2sh({
-			redeem: bjs.payments.p2wpkh({ pubkey: pubkey, network: this.network }),
+		payment = payments.p2sh({
+			redeem: payments.p2wpkh({ pubkey: pubkey, network: this.network }),
 			network: this.network
 		})
 	}
 
 	if (purpose === 84) {
-		payment = bjs.payments.p2wpkh({ pubkey: pubkey, network: this.network })
+		payment = payments.p2wpkh({ pubkey: pubkey, network: this.network })
 	}
 
   return payment.address
@@ -308,9 +306,9 @@ fromZPub.prototype.getAddress = function (index, isChange, purpose) {
  */
 fromZPub.prototype.getPayment = function (index, isChange) {
   let change = isChange === true ? 1 : 0
-    , pubkey = bjs.bip32.fromBase58(this.zpub, this.network).derive(change).derive(index).publicKey
+    , pubkey = bip32.fromBase58(this.zpub, this.network).derive(change).derive(index).publicKey
 
-  const payment = bjs.payments.p2wpkh({
+  const payment = payments.p2wpkh({
     pubkey: pubkey,
     network: this.network
   })
@@ -328,7 +326,7 @@ function b58Encode(pub, data) {
 module.exports = {
   generateMnemonic: bip39.generateMnemonic,
   entropyToMnemonic: bip39.entropyToMnemonic,
-  fromSeed: fromSeed,
+  fromMnemonic: fromMnemonic,
   fromZPrv: fromZPrv,
   fromZPub: fromZPub
 }

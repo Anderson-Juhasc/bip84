@@ -11,7 +11,7 @@ function init(networks, slip44, pub_types, isTestnet) {
     }
   }
 
-  let root = new BIP84.fromSeed(mnemonic, '', isTestnet, slip44, pub_types, network);
+  let root = new BIP84.fromMnemonic(mnemonic, '', isTestnet, slip44, pub_types, network);
   let child0 = root.deriveAccount(0);
   let account0 = new BIP84.fromZPrv(child0, pub_types, networks);
   return { root, child0, account0 };
