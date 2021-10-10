@@ -1,6 +1,6 @@
 {
   "name": "bip84",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "BIP84 - Derives segwit + bech32 addresses from seed, zprv/zpub and vprv/vpub in javascript",
   "main": "./src/index.js",
   "repository": {
@@ -14,6 +14,8 @@
     "bitcoin",
     "bip84",
     "bech32",
+    "legacy",
+    "segwit",
     "segwit"
   ],
   "author": "Anderson Juhasc",
