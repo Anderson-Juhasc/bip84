@@ -170,6 +170,7 @@ fromZPrv.prototype.getPublicKey = function (index, isChange) {
 fromZPrv.prototype.getAddress = function (index, isChange, purpose) {
   let change = isChange === true ? 1 : 0
     , pubkey = bip32.fromBase58(this.zprv, this.network).derive(change).derive(index).publicKey
+    , payment = {}
 
 	purpose = purpose || 84
 
