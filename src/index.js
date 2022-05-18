@@ -20,7 +20,7 @@ function fromMnemonic(mnemonic, password, isTestnet, coinType, pubTypes, network
   this.isTestnet = isTestnet === true
   this.coinType = this.isTestnet ? 1 : coinType ? coinType : 0 // 0 is for Bitcoin and 1 is testnet for all coins
   this.pubTypes = pubTypes || bitcoinPubTypes
-  this.network = network || this.isTestnet ? bitcoinNetworks.testnet : bitcoinNetworks.mainnet
+  this.network = network || (this.isTestnet ? bitcoinNetworks.testnet : bitcoinNetworks.mainnet)
 }
 
 /**
