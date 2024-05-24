@@ -1,8 +1,11 @@
-const { bip32, networks, payments } = require('bitcoinjs-lib')
-    , b58 = require('bs58check')
-    , bip39 = require('bip39')
-    , bitcoinPubTypes = { mainnet: { zprv: '04b2430c', zpub: '04b24746'}, testnet: { vprv: '045f18bc', vpub: '045f1cf6'} }
-    , bitcoinNetworks = { mainnet: networks.bitcoin, testnet: networks.testnet }
+const { networks, payments } = require('bitcoinjs-lib')
+const { BIP32Factory } = require('bip32')
+const ecc = require('@bitcoinerlab/secp256k1')
+const bip32 = BIP32Factory(ecc)
+const b58 = require('bs58check')
+const bip39 = require('bip39')
+const bitcoinPubTypes = { mainnet: { zprv: '04b2430c', zpub: '04b24746'}, testnet: { vprv: '045f18bc', vpub: '045f1cf6'} }
+const bitcoinNetworks = { mainnet: networks.bitcoin, testnet: networks.testnet }
 
 /**
  * Constructor
@@ -79,17 +82,31 @@ function fromZPrv(zprv, pubTypes, networks) {
   this.zprv = this.toNode(zprv)
 }
 
+const byteToHex = (byte) => {
+  const key = '0123456789abcdef'
+  let bytes = new Uint8Array(byte)
+  let newHex = ''
+  let currentChar = 0
+  for (let i=0; i<bytes.length; i++) { // Go over each 8-bit byte
+    currentChar = (bytes[i] >> 4)      // First 4-bits for first hex char
+    newHex += key[currentChar]         // Add first hex char to string
+    currentChar = (bytes[i] & 15)      // Erase first 4-bits, get last 4-bits for second hex char
+    newHex += key[currentChar]         // Add second hex char to string
+  }
+  return newHex
+}
+
 fromZPrv.prototype.toNode = function (zprv) {
   let payload = b58.decode(zprv)
-    , version = payload.slice(0, 4)
+    , prefix = byteToHex(payload.slice(0, 4))
     , key = payload.slice(4)
     , buffer = undefined
 
-  if (!Object.values(this.pubTypes.mainnet).includes(version.toString('hex')) && !Object.values(this.pubTypes.testnet).includes(version.toString('hex'))) {
+  if (!Object.values(this.pubTypes.mainnet).includes(prefix) && !Object.values(this.pubTypes.testnet).includes(prefix)) {
     throw new Error('prefix is not supported')
   }
 
-  if (Object.values(this.pubTypes.mainnet).includes(version.toString('hex'))) {
+  if (Object.values(this.pubTypes.mainnet).includes(prefix)) {
     const buf = Buffer.allocUnsafe(4)
     buf.writeInt32BE(this.networks.mainnet.bip32.private, 0)
     buffer = Buffer.concat([buf, key]) // zprv
@@ -97,7 +114,7 @@ fromZPrv.prototype.toNode = function (zprv) {
     this.isTestnet = false
   }
 
-  if (Object.values(this.pubTypes.testnet).includes(version.toString('hex'))) {
+  if (Object.values(this.pubTypes.testnet).includes(prefix)) {
     const buf = Buffer.allocUnsafe(4)
     buf.writeInt32BE(this.networks.testnet.bip32.private, 0)
     buffer = Buffer.concat([buf, key]) // vprv
@@ -214,15 +231,15 @@ function fromZPub(zpub, pubTypes, networks) {
 
 fromZPub.prototype.toNode = function (zpub) {
   let payload = b58.decode(zpub)
-    , version = payload.slice(0, 4)
+    , prefix = byteToHex(payload.slice(0, 4))
     , key = payload.slice(4)
     , buffer = undefined
 
-  if (!Object.values(this.pubTypes.mainnet).includes(version.toString('hex')) && !Object.values(this.pubTypes.testnet).includes(version.toString('hex'))) {
+  if (!Object.values(this.pubTypes.mainnet).includes(prefix) && !Object.values(this.pubTypes.testnet).includes(prefix)) {
     throw new Error('prefix is not supported')
   }
 
-  if (Object.values(this.pubTypes.mainnet).includes(version.toString('hex'))) {
+  if (Object.values(this.pubTypes.mainnet).includes(prefix)) {
     const buf = Buffer.allocUnsafe(4)
     buf.writeInt32BE(this.networks.mainnet.bip32.public, 0)
     buffer = Buffer.concat([buf, key]) // zpub
@@ -230,7 +247,7 @@ fromZPub.prototype.toNode = function (zpub) {
     this.isTestnet = false
   }
 
-  if (Object.values(this.pubTypes.testnet).includes(version.toString('hex'))) {
+  if (Object.values(this.pubTypes.testnet).includes(prefix)) {
     const buf = Buffer.allocUnsafe(4)
     buf.writeInt32BE(this.networks.testnet.bip32.public, 0)
     buffer = Buffer.concat([buf, key]) // vpub
