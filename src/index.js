@@ -19,6 +19,7 @@ const bitcoinNetworks = { mainnet: networks.bitcoin, testnet: networks.testnet }
  * @return 
  */
 function fromMnemonic(mnemonic, password, isTestnet, coinType, pubTypes, network) {
+  if (!bip39.validateMnemonic(mnemonic)) throw new Error('could not validate mnemonic words')
   this.seed = bip39.mnemonicToSeedSync(mnemonic, password ? password : '')
   this.isTestnet = isTestnet === true
   this.coinType = this.isTestnet ? 1 : coinType ? coinType : 0 // 0 is for Bitcoin and 1 is testnet for all coins
@@ -344,6 +345,7 @@ function b58Encode(pub, data) {
 module.exports = {
   generateMnemonic: bip39.generateMnemonic,
   entropyToMnemonic: bip39.entropyToMnemonic,
+  validateMnemonic: bip39.validateMnemonic,
   fromMnemonic: fromMnemonic,
   fromZPrv: fromZPrv,
   fromZPub: fromZPub

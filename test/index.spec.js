@@ -28,6 +28,14 @@ describe('account0', () => {
     data = init();
   });
 
+  it("Validating mnemonic words", () => {
+    const mnemonic1 = BIP84.generateMnemonic()
+    //const mnemonic1 = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+    const mnemonic2 = 'invalid words'
+    expect(BIP84.validateMnemonic(mnemonic1)).toEqual(true);
+    expect(BIP84.validateMnemonic(mnemonic2)).toEqual(false);
+  });
+
   it("Generates correct rootPublic and rootPrivate", () => {
     expect(data.root.getRootPrivateKey()).toEqual('zprvAWgYBBk7JR8Gjrh4UJQ2uJdG1r3WNRRfURiABBE3RvMXYSrRJL62XuezvGdPvG6GFBZduosCc1YP5wixPox7zhZLfiUm8aunE96BBa4Kei5');
     expect(data.root.getRootPublicKey()).toEqual('zpub6jftahH18ngZxLmXaKw3GSZzZsszmt9WqedkyZdezFtWRFBZqsQH5hyUmb4pCEeZGmVfQuP5bedXTB8is6fTv19U1GQRyQUKQGUTzyHACMF');
